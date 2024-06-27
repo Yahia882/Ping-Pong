@@ -1,6 +1,5 @@
 # Ping Pong Game
-
-added a start window and restart button when you enter the game to let you get back to the start window
+simple Paddle game in java with a start window and restart button when you enter the game to let you get back to the start window
 
 # how it looks
 
