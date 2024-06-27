@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 public class GamePanel extends JPanel implements Runnable {
 	static final int Game_WIDTH = 1000;
@@ -18,24 +19,77 @@ public class GamePanel extends JPanel implements Runnable {
 	Paddle paddle2;
 	Ball ball;
 	Score score;
+	boolean running = false;
+	JButton restarButton;
+	JButton starButton;
+
+	// Game begins with the start screen/window
 	public GamePanel() {
+		start_window();
+
+	}
+	// start window method 1. set Running = false to prevent starting the game
+	// (paint method and run method)
+	// 2. create a start button and its action is to start the game
+
+	public void start_window() {
+		running = false;
+		this.setBackground(Color.BLACK);
+		this.setPreferredSize(SCREEN_SIZE);
+		starButton = new JButton("Start");
+		starButton.setVisible(true);
+		starButton.setBackground(Color.white);
+		starButton.setForeground(Color.BLACK);
+		this.setLayout(null);
+		starButton.setLocation((Game_WIDTH / 2) - 50, 0);
+		starButton.setSize(100, 50);
+		starButton.setBorder(new EmptyBorder(5, 15, 5, 15));
+		starButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				starButton.setVisible(false);
+				start_game();
+
+			}
+		});
+		this.add(starButton);
+		repaint();
+	}
+	// initialize all game components, adding a restart button (to let u get back to
+	// the start window) and then executing the run() method
+
+	public void start_game() {
+		running = true;
 		newPaddles();
 		newBall();
 		this.setBackground(Color.BLACK);
-		score = new Score(Game_WIDTH,Game_HEIGHT);
+		score = new Score(Game_WIDTH, Game_HEIGHT);
 		this.setFocusable(true);
+		this.requestFocus();
 		this.addKeyListener(new al());
-		this.setPreferredSize(SCREEN_SIZE);
+		this.setLayout(null);
+		restarButton = new JButton("Restart");
+		restarButton.setVisible(true);
+		restarButton.setBackground(Color.white);
+		restarButton.setForeground(Color.BLACK);
+		restarButton.setLocation((Game_WIDTH / 2) - 50, Game_HEIGHT - 50);
+		restarButton.setSize(100, 50);
+		restarButton.setBorder(new EmptyBorder(5, 15, 5, 15));
+		restarButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				restarButton.setVisible(false);
+				Restart();
+			}
+		});
+		this.add(restarButton);
+		this.revalidate();
+		this.repaint();
 		thread = new Thread(this);
 		thread.start();
-
 	}
 
-	
-
-
-
-
+	public void Restart() {
+		start_window();
+	}
 
 	public void newBall() {
 		random = new Random();
@@ -53,15 +107,19 @@ public class GamePanel extends JPanel implements Runnable {
 
 	public void paint(Graphics g) {
 
-		
+		if (running) {
 
 			image = createImage(Game_WIDTH, Game_HEIGHT);
-			;
+			restarButton.repaint();
 			graphics = image.getGraphics();
 			draw(graphics);
 			g.drawImage(image, 0, 0, this);
 
-		
+		} else {
+			g.setColor(Color.BLACK);
+			g.fillRect(0, 0, Game_WIDTH, Game_HEIGHT);
+			starButton.repaint();
+		}
 
 	}
 
@@ -151,27 +209,30 @@ public class GamePanel extends JPanel implements Runnable {
 	}
 
 	public void run() {
-		
-			long lastTime = System.nanoTime();
-			double amountOfTicks = 60.0;
-			double ns = 1000000000 / amountOfTicks;
-			double Delta = 0;
-			while (true) {
-				long now = System.nanoTime();
-				Delta += (now - lastTime) / ns;
-				lastTime = now;
-				if (Delta >= 1) {
-					move();
-					checkCollision();
-					repaint();
-					Delta--;
 
-				}
+		long lastTime = System.nanoTime();
+		double amountOfTicks = 60.0;
+		double ns = 1000000000 / amountOfTicks;
+		double Delta = 0;
+		// Main game loop
+		while (true) {
+			// Check if the game is running; if not, exit the loop
+			if (!running) {
+				break;
+			}
+			long now = System.nanoTime();
+			Delta += (now - lastTime) / ns;
+			lastTime = now;
+			if (Delta >= 1) {
+				move();
+				checkCollision();
+				repaint();
+				Delta--;
 
 			}
-		}
 
-	
+		}
+	}
 
 	public class al extends KeyAdapter {
 		public void keyPressed(KeyEvent e) {
