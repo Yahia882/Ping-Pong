@@ -1,6 +1,6 @@
 # Ping Pong Game
 
-simple Paddle game in java
+simple Paddle game in java.
 
 # how it looks
 
@@ -12,4 +12,8 @@ JDK (Java Development Kit) to compile and run.
 
 # how it runs
 
-download and run the Pong.jar file
+download and run the Pong.jar file.
+
+# Additional Features
+
+i added a start window and restart button on the "start-window" branch.
